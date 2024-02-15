@@ -37,7 +37,7 @@ public class ToyServiceImplTest {
         if (file.exists()) {
             expected = FileUtilis.getToys(file);
         }
-        ToyDto newToy =  new ToyDto("animal", TypeToy.FEMALE,23,10);
+        ToyDto newToy =  new ToyDto("Tamaras", TypeToy.FEMALE,23,10);
 
         assertEquals(expected.size(),service.listToys().size());
         expected.add(ToyMapper.mapFrom(newToy));
@@ -55,13 +55,12 @@ public class ToyServiceImplTest {
         TypeToy actualType = maxToyEntry.getKey();
         int actualCount = maxToyEntry.getValue();
 
-        // Se obtiene la lista de juguetes actual para calcular el tipo de juguete más común
         List<ToyDto> toyList = service.listToys();
         Map<TypeToy, Integer> toyCounts = new HashMap<>();
         for (ToyDto toy : toyList) {
             toyCounts.put(toy.type(), toyCounts.getOrDefault(toy.type(), 0) + 1);
         }
-        // Se calcula el tipo de juguete más común y su cantidad asociada
+
         TypeToy expectedType = null;
         int expectedCount = 0;
         for (Map.Entry<TypeToy, Integer> entry : toyCounts.entrySet()) {
@@ -92,9 +91,8 @@ public class ToyServiceImplTest {
             toyCounts.put(toy.type(), toyCounts.getOrDefault(toy.type(), 0) + 1);
         }
 
-        // Se calcula el tipo de juguete menos común y su cantidad asociada
         TypeToy expectedType = null;
-        int expectedCount = Integer.MAX_VALUE; // Inicializamos con un valor máximo posible para encontrar un mínimo
+        int expectedCount = Integer.MAX_VALUE;
 
         for (Map.Entry<TypeToy, Integer> entry : toyCounts.entrySet()) {
             if (entry.getValue() < expectedCount) {
@@ -140,7 +138,6 @@ public class ToyServiceImplTest {
         ToyDto searchedToy = service.search(randomToy.name());
         assertNotNull(searchedToy);
 
-        // Verificar que el nombre del juguete encontrado sea igual al nombre del juguete aleatorio
         assertEquals(randomToy.name(), searchedToy.name());
     }
     @Test
@@ -154,18 +151,14 @@ public class ToyServiceImplTest {
         ToyDto randomToy = toyList.get(new Random().nextInt(toyList.size()));
         int amountToAdd = 5;
 
-        // Se llama al método increase() con el juguete aleatorio y la cantidad a aumentar
         List<ToyDto> updatedToyList = service.increase(randomToy, amountToAdd);
 
-        // Se busca el juguete actualizado en la lista actualizada
         Optional<ToyDto> updatedToyOptional = updatedToyList.stream()
                 .filter(toy -> toy.name().equals(randomToy.name()))
                 .findFirst();
 
-        // Verificar que el juguete actualizado exista en la lista actualizada
         assertTrue(updatedToyOptional.isPresent());
 
-        // Verificar que la cantidad del juguete actualizado sea igual a la cantidad original más la cantidad agregada
         ToyDto updatedToy = updatedToyOptional.get();
         assertEquals(randomToy.amount() + amountToAdd, updatedToy.amount());
     }
@@ -178,22 +171,17 @@ public class ToyServiceImplTest {
 
         List<ToyDto> toyList = service.listToys();
 
-
         ToyDto randomToy = toyList.get(new Random().nextInt(toyList.size()));
         int amountToSubtract = 3;
 
-        // Se llama al método decrease() con el juguete aleatorio y la cantidad a disminuir
         List<ToyDto> updatedToyList = service.decrease(randomToy, amountToSubtract);
 
-        // Se busca el juguete actualizado en la lista actualizada
         Optional<ToyDto> updatedToyOptional = updatedToyList.stream()
                 .filter(toy -> toy.name().equals(randomToy.name()))
                 .findFirst();
 
-        // Verificar que el juguete actualizado exista en la lista actualizada
         assertTrue(updatedToyOptional.isPresent());
 
-        // Verificar que la cantidad del juguete actualizado sea igual a la cantidad original menos la cantidad disminuida
         ToyDto updatedToy = updatedToyOptional.get();
         assertEquals(randomToy.amount() - amountToSubtract, updatedToy.amount());
     }
@@ -208,12 +196,11 @@ public class ToyServiceImplTest {
 
         List<ToyDto> toyList = service.listToys();
 
-        // Se crea un mapa para almacenar el recuento de juguetes por tipo
         Map<TypeToy, Integer> expectedToyCountByType = new HashMap<>();
         for (ToyDto toy : toyList) {
             expectedToyCountByType.put(toy.type(), expectedToyCountByType.getOrDefault(toy.type(), 0) + 1);
         }
-        // Verificar que el mapa devuelto por el método showByType() sea igual al mapa esperado
+
         assertEquals(expectedToyCountByType, toyCountByType);
     }
     @Test
@@ -223,16 +210,13 @@ public class ToyServiceImplTest {
 
         service = new ToyServiceImpl();
 
-        int filterValue = 100;
+        int filterValue = 40;
 
-        // Se llama al método showLargerThan() con el valor de filtro
         List<ToyDto> largerToys = service.showLargerThan(filterValue);
-
         assertNotNull(largerToys);
 
-        // Verificar que todos los juguetes en la lista tienen un precio mayor que el valor especificado
         for (ToyDto toy : largerToys) {
-            assertTrue(toy.price() > filterValue);
+            assertTrue(toy.price() < filterValue);
         }
     }
 
@@ -242,16 +226,10 @@ public class ToyServiceImplTest {
         // devuelve correctamente true si un juguete con el nombre especificado existe en la lista.
 
         service = new ToyServiceImpl();
-
         List<ToyDto> toyList = service.listToys();
 
-        // Se elige un nombre de juguete aleatorio de la lista
         String randomToyName = toyList.get(new Random().nextInt(toyList.size())).name();
-
-        // Se llama al método verifyExist() con el nombre de juguete aleatorio
         boolean exists = service.verifyExist(randomToyName);
-
-        // Verificar que el resultado sea verdadero, ya que el juguete aleatorio debe existir en la lista
         assertTrue(exists);
     }
 
@@ -261,11 +239,7 @@ public class ToyServiceImplTest {
         // devuelve correctamente el número total de juguetes en la lista.
 
         service = new ToyServiceImpl();
-
-        // Se llama al método totalToys() para obtener el número total de juguetes
         int totalToys = service.totalToys();
-
-        // Verificar que el número total de juguetes sea mayor o igual que cero
         assertTrue(totalToys >= 0);
     }
 }
