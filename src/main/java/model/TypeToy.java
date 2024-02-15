@@ -5,6 +5,7 @@ import java.util.Arrays;
 public enum TypeToy {
     FEMALE(0),
     MALE(1),
+
     UNICEX(2);
 
     private final int identifier;
