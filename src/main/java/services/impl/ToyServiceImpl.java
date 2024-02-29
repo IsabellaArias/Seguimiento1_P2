@@ -1,5 +1,9 @@
 package services.impl;
 
+import exeptions.AddToyException;
+import exeptions.InsufficientAmountException;
+import exeptions.ToyNotFoundException;
+import exeptions.ToyNotLargerThanException;
 import mapping.dtos.ToyDto;
 import mapping.mapper.ToyMapper;
 import model.Toy;
@@ -31,13 +35,15 @@ public class ToyServiceImpl implements ToyStoreImpl {
 
     @Override
     public List<ToyDto> addToy(ToyDto toyDto) throws Exception {
-        if(!verifyExist(toyDto.name())){
-            listToy.add(ToyMapper.mapFrom(toyDto));
-            FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
-            return listToy.stream().map(ToyMapper::mapFrom).toList();
-        }
-        throw new Exception("This toy is in the list");
+
+            if (!verifyExist(toyDto.name())) {
+                listToy.add(ToyMapper.mapFrom(toyDto));
+                FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
+                return listToy.stream().map(ToyMapper::mapFrom).toList();
+             }
+        throw new AddToyException();
     }
+
 
     @Override
     public  Map.Entry<TypeToy,Integer> maxToy() throws Exception {
@@ -52,7 +58,9 @@ public class ToyServiceImpl implements ToyStoreImpl {
     @Override
     public Map<TypeToy, Integer> sort() throws Exception {
         return showByType().entrySet().stream()
+                //Esta parte ordena el flujo de elementos en función de los valores
                 .sorted(Map.Entry.comparingByValue())
+                //recopila los elementos ordenados en un nuevo mapa.
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -67,53 +75,81 @@ public class ToyServiceImpl implements ToyStoreImpl {
                     .findFirst().stream().map(ToyMapper::mapFrom).toList();
             return list.get(0);
         }
-        throw new Exception("Dont found");
+        throw new ToyNotFoundException();
     }
 
     @Override
     public List<ToyDto> increase(ToyDto toyDto, int amount) throws Exception {
-        listToy.stream().filter(toy1 -> Objects.equals(toy1.getName(),toyDto.name()))
-                .peek(toy -> toy.setAmount(toy.getAmount()+amount))
+        Optional<Toy> optionalToy = listToy.stream()
+                .filter(toy -> Objects.equals(toy.getName(), toyDto.name()))
                 .findFirst();
-        FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
-        return listToy.stream().map(ToyMapper::mapFrom).toList();
+
+        if (optionalToy.isPresent()) {
+            Toy toy = optionalToy.get();
+            int currentAmount = toy.getAmount();
+            int newAmount = currentAmount + amount;
+            if (newAmount < 0) {
+                throw new InsufficientAmountException();
+            } else {
+                toy.setAmount(newAmount);
+                FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
+                return listToy.stream().map(ToyMapper::mapFrom).toList();
+            }
+        } else {
+            throw new ToyNotFoundException();
+        }
     }
 
     @Override
     public List<ToyDto> decrease(ToyDto toyDto, int amount) throws Exception {
-        listToy.stream().filter(toy1 -> Objects.equals(toy1.getName(),toyDto.name()))
-                .peek(toy -> {
-                    if(toy.getAmount()>0){
-                        toy.setAmount(toy.getAmount() - amount);
-                    } else if (toy.getAmount()==0) {
-                        listToy.remove(toy);
-                    }
-                })
+        Optional<Toy> optionalToy = listToy.stream()
+                .filter(toy -> Objects.equals(toy.getName(), toyDto.name()))
                 .findFirst();
-        FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
-        return listToy.stream().map(ToyMapper::mapFrom).toList();
+
+        if (optionalToy.isPresent()) {
+            Toy toy = optionalToy.get();
+            if (toy.getAmount() >= amount) {
+                toy.setAmount(toy.getAmount() - amount);
+                FileUtilis.saveToys(new File(Constants.PATH_TOYS), listToy);
+                return listToy.stream().map(ToyMapper::mapFrom).toList();
+            } else {
+                throw new InsufficientAmountException();
+            }
+        } else {
+            throw new ToyNotFoundException();
+        }
     }
 
     @Override
     public Map<TypeToy, Integer> showByType() throws Exception {
+        //TreeMap  mantiene las claves ordenadas según su orden natural
+
         Map<TypeToy,Integer> showByType = new TreeMap<>();
         for(Toy toy : listToy){
             TypeToy type = toy.getType();
+            //put se utiliza para insertar un par clave-valor en un mapa
             showByType.put(type,showByType.getOrDefault(type,0)+1);
         }
         return showByType;
     }
 
     @Override
-    public List<ToyDto> showLargerThan(double value) throws Exception {
-        return listToy.stream()
-                .filter(toy -> toy.getPrice() >= value)
-                .toList().stream().map(ToyMapper::mapFrom).toList();
+    public List<ToyDto> showLargerThan(double value) throws ToyNotLargerThanException {
+        if (listToy.stream().anyMatch(toy -> toy.getPrice() > value)) {
+            return listToy.stream()
+                    .filter(toy -> toy.getPrice() >= value)
+                    .map(ToyMapper::mapFrom)
+                    .toList();
+        } else {
+            throw new ToyNotLargerThanException();
+        }
     }
 
     @Override
     public Boolean verifyExist(String name) {
-        return listToy.stream().anyMatch(e -> e.getName().equalsIgnoreCase(name));
+        return listToy.stream()
+                // anyMatch() recorre  anyMatch() recorre los elementos del flujo hasta que encuentra un elemento que cumple con la condición.
+                .anyMatch(e -> e.getName().equalsIgnoreCase(name));
     }
 
     @Override
