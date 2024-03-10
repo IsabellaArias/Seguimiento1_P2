@@ -1,11 +1,11 @@
 package services.impl;
 
-import exeptions.AddToyException;
-import exeptions.InsufficientAmountException;
-import exeptions.ToyNotFoundException;
-import exeptions.ToyNotLargerThanException;
+import exceptions.AddToyException;
+import exceptions.InsufficientAmountException;
+import exceptions.ToyNotFoundException;
+import exceptions.ToyNotLargerThanException;
 import mapping.dtos.ToyDto;
-import mapping.mapper.ToyMapper;
+import mapping.mappers.ToyMapper;
 import model.Toy;
 import model.TypeToy;
 import services.ToyStoreImpl;

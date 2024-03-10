@@ -19,4 +19,5 @@ public interface ToyStoreImpl {
     List<ToyDto> showLargerThan(double value) throws Exception;
     Boolean verifyExist(String name);
     Integer totalToys() throws Exception;
+
 }

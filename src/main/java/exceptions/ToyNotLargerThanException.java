@@ -1,4 +1,4 @@
-package exeptions;
+package exceptions;
 
 public class ToyNotLargerThanException extends Exception {
     public ToyNotLargerThanException() {

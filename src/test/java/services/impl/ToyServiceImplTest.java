@@ -1,6 +1,6 @@
 package services.impl;
 import mapping.dtos.ToyDto;
-import mapping.mapper.ToyMapper;
+import mapping.mappers.ToyMapper;
 import model.Toy;
 import model.TypeToy;
 import org.junit.jupiter.api.*;

@@ -1,4 +1,4 @@
-package mapping.mapper;  // Its goal is to convert objects of one type into another
+package mapping.mappers;  // Its goal is to convert objects of one type into another
 
 import mapping.dtos.ToyDto;
 import model.Toy;

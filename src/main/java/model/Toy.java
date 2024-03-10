@@ -2,12 +2,12 @@ package model;
 
 import java.io.Serializable;
 
+
 public class Toy implements Serializable {
     private String name;
     private TypeToy type;
     private Integer price;
     private Integer amount;
-
     public Toy() {
     }
 
