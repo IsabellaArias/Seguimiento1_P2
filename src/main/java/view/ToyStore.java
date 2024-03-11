@@ -49,7 +49,7 @@ public class ToyStore {
                     System.out.println("the task is done!");
                 }
                 case "2" -> {
-                    CompletableFuture<List<ToyDto>> future = CompletableFuture.supplyAsync(() -> {
+                    /*CompletableFuture<List<ToyDto>> future = CompletableFuture.supplyAsync(() -> {
                         try {
                             System.out.println("----ADD TOY----");
                             System.out.println("Enter the name: ");
@@ -67,7 +67,7 @@ public class ToyStore {
                         return null;
                     });
                     future.get();
-                    System.out.println("the task is done!");
+                    System.out.println("the task is done!");*/
                 }
 
                 case "3" -> {

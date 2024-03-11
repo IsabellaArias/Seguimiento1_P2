@@ -12,5 +12,5 @@ public class Details {
     private Client client;
     private Employee employee;
     private Toy toy;
-    private Sales sales;
+    private Sale sales;
 }

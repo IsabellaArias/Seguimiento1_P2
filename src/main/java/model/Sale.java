@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Builder
-public class Sales {
+public class Sale {
     private Integer invoice_number;
     private LocalDate date;
 }
