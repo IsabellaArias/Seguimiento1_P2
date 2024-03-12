@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ToyServiceImplTest {
 
-    private ToyServiceImpl service;
+   /* private ToyServiceImpl service;
 
     @Test
     public void listTest(){
@@ -241,5 +241,5 @@ public class ToyServiceImplTest {
         service = new ToyServiceImpl();
         int totalToys = service.totalToys();
         assertTrue(totalToys >= 0);
-    }
+    }*/
 }

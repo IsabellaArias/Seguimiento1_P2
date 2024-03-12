@@ -13,6 +13,7 @@ public class ToyStoreRepository implements ToysRepository<Toy> {
     private Connection getConnection() throws SQLException {
         return DatabaseConnection.getInstance();
     }
+    Toy toy = new Toy();
     private Toy createToy(ResultSet resultSet) throws SQLException {
         Toy toy = new Toy();
         toy.setId(resultSet.getInt("id"));
@@ -29,28 +30,65 @@ public class ToyStoreRepository implements ToysRepository<Toy> {
     }
 
     @Override
-    public void save(Toy toy) {
-
+    public List<Toy> listToys() {
+        List<Toy> tList = new ArrayList<>();
+        try (Statement statement = getConnection().createStatement();
+             ResultSet resultSet = statement.executeQuery
+                     (
+                             """
+                                SELECT t.*, t.name as toy_name, t.id as toy_id, t.price_unit as toy_price ,tToys.type as Type_name
+                                FROM toys AS t 
+                                INNER JOIN type_toys AS tToys ON t.id_type = tToys.id;
+                              """
+                     ))
+        {
+            while (resultSet.next()) {
+                Toy toy = createToy(resultSet);
+                tList.add(toy);
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return tList;
     }
 
     @Override
-    public List<Toy> listToys() {
-        List<Toy> toyList = new ArrayList<>();
-        try (Statement statement = getConnection().createStatement();
-             ResultSet resultSet = statement.executeQuery("""
-            SELECT t.*, t.id as toy_id, t.name as toy_name, t.price_unit as toy_price,
-                   tToys.id as type_id, tToys.type as Type_name
-            FROM toys AS t 
-            INNER JOIN type_toys AS tToys ON t.id_type = tToys.id;
-            """)) {
-            while (resultSet.next()) {
-                Toy toy = createToy(resultSet);
-                toyList.add(toy);
+    public Toy Byid(Integer id) {
+        try (PreparedStatement preparedStatement = getConnection()
+                .prepareStatement("""
+                        SELECT t.*, t.id as toy_id, t.name as toy_name, t.price_unit as toy_price,
+                               tToys.id as type_id, tToys.type as Type_name FROM toys AS t 
+                        INNER JOIN type_toys AS tToys ON t.id_type = tToys.id WHERE t.id=?;
+                        """)
+        ){
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet=preparedStatement.executeQuery();
+            if (resultSet.next()){
+                return createToy(resultSet);
             }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return toyList;
+        return null;
+    }
+
+    @Override
+    public void save(Toy toy) {
+        try(PreparedStatement preparedStatement = getConnection()
+                .prepareStatement("""
+                                      INSERT INTO toys (name, id_type, amount, price_unit, price_total) VALUES (?,?,?,?,?)
+                                      """)
+        ){
+            preparedStatement.setString(1, toy.getName());
+            preparedStatement.setInt(2, toy.getType().getId());
+            preparedStatement.setInt(3, toy.getAmount());
+            preparedStatement.setInt(4, toy.getPrice_unit());
+            preparedStatement.setInt(5,toy.getPrice_total());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

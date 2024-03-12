@@ -16,9 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class
-
-MainSale {
+public class MainSale {
     public static void main(String[] args) {
         try (Connection connection = DatabaseConnection.getInstance()) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
